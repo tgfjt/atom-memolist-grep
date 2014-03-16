@@ -1,5 +1,5 @@
 {View, EditorView, $} = require 'atom'
-GrepFiles = require './atom-memolist-files'
+GrepFiles = require './atom-memolist-execgrep'
 ShowPanel = require './atom-memolist-panel'
 path = require 'path'
 

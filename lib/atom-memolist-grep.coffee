@@ -1,4 +1,4 @@
-{View, EditorView, $} = require 'atom'
+{View, TextEditorView, $} = require 'atom-space-pen-views'
 GrepFiles = require './atom-memolist-execgrep'
 ShowPanel = require './atom-memolist-panel'
 path = require 'path'
@@ -11,12 +11,12 @@ class AtomMemolistGrepView extends View
     @atomMemolistNew = new AtomMemolistGrepView(state.atomMemolistGrep)
 
   initialize: ->
-    atom.workspaceView.command 'atom-memolist-grep:toggle', => @toggle()
-    @miniEditor.setPlaceholderText('Enter Keyword to search Memo');
-    @on 'core:confirm', => @confirm()
-    @on 'core:cancel', => @detach()
+    atom.commands.add "atom-workspace",
+      'atom-memolist-grep:toggle', => @toggle()
+    atom.commands.add(this[0], 'core:confirm', () => this.confirm())
+    atom.commands.add(this[0], 'core:cancel', () => this.detach())
 
-  @detaching: false
+  @cancelling: false
 
   toggle: ->
     if @hasParent()
@@ -26,10 +26,13 @@ class AtomMemolistGrepView extends View
 
   @content: (params)->
     @div class: 'atom-memolist-grep overlay from-top select-list', =>
-      @subview 'miniEditor', new EditorView({mini:true})
+      @subview 'miniEditor', new TextEditorView({
+        mini: true
+        placeholderText: 'Enter Keyword to search Memo'
+      })
 
   confirm: ->
-    keyword = @miniEditor.getEditor().getText()
+    keyword = @miniEditor.getText()
 
     memodir = atom.config.get('atom-memolist.memo_dir_path')
 
@@ -50,21 +53,19 @@ class AtomMemolistGrepView extends View
     return unless @hasParent()
 
     console.log 'atom-memolist-grep: detach'
-    @detaching = true
+    @cancelling = true
     @miniEditor.setText ''
 
     if @previouslyFocusedElement?.isOnDom()
       @previouslyFocusedElement.focus()
-    else
-      atom.workspaceView.focus()
 
     super
 
-    @detaching = false
+    @cancelling = false
 
   attach: ->
     console.log 'atom-memolist-grep: attach'
-    @detaching = true
+    @cancelling = true
     @previouslyFocusedElement = $(':focus')
-    atom.workspaceView.append(this)
+    atom.workspace.addTopPanel(item: this)
     @miniEditor.focus()

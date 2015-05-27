@@ -1,4 +1,4 @@
-{SelectListView} = require 'atom'
+{SelectListView} = require 'atom-space-pen-views'
 
 module.exports =
 class AtomMemolistPanel extends SelectListView
@@ -7,7 +7,7 @@ class AtomMemolistPanel extends SelectListView
     @settings = atom.config.get('atom-memolist')
     @addClass('overlay from-top')
     @setItems(lists)
-    atom.workspaceView.append(this)
+    atom.workspace.addTopPanel(item: this)
     @focusFilterEditor()
 
   viewForItem: (item) ->
@@ -15,4 +15,4 @@ class AtomMemolistPanel extends SelectListView
 
   confirmed: (item) ->
     console.log("#{@settings.memo_dir_path + '/' + item} is found")
-    atom.workspaceView.open @settings.memo_dir_path + '/' + item
+    atom.workspace.open @settings.memo_dir_path + '/' + item
